@@ -1,0 +1,29 @@
+name: CI/CD CRUD Kesehatan
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          # Ini tetap, karena mengambil dari "Secrets" yang mane buat tadi
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy ke EC2
+        run: |
+          # IP_EC2 sudah saya ganti ke IP mane
+          ssh -o StrictHostKeyChecking=no ubuntu@52.77.220.247 << 'EOF'
+            # nama-project sudah saya ganti ke Tugas-CI-CD
+            cd /var/www/Tugas-CI-CD
+            git pull origin main
+            sudo systemctl restart nginx
+          EOF
